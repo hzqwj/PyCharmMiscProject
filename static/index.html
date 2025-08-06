@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能安全管理系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus/dist/index.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-router@4.1.6/dist/vue-router.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-plus/dist/index.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="app.js" defer></script>
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            overflow: hidden;
+        }
+
+        #app {
+            height: 100%;
+            width: 100%;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card {
+            width: 420px;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            background-color: white;
+            position: relative;
+            z-index: 2;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #409EFF 0%, #64b5f6 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 36px;
+            box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+        }
+
+        .login-title {
+            font-size: 24px;
+            color: #303133;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #909399;
+            margin-bottom: 0;
+        }
+
+        .login-form {
+            margin-top: 20px;
+        }
+
+        .login-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .login-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 0.6;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.1) 0%, rgba(64, 158, 255, 0.1) 100%);
+        }
+
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            right: -50px;
+            background: linear-gradient(135deg, rgba(103, 194, 58, 0.1) 0%, rgba(67, 160, 71, 0.1) 100%);
+        }
+
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            right: 20%;
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.1) 0%, rgba(255, 171, 0, 0.1) 100%);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .el-input__wrapper {
+            border-radius: 8px !important;
+        }
+
+        .el-button {
+            border-radius: 8px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <el-container style="height: 100vh;">
+            <!-- 登录界面 -->
+            <!-- 在登录表单下方添加 -->
+<!-- 注册对话框 -->
+<el-dialog v-model="showRegister" title="注册新账户" width="420px">
+  <el-form :model="registerForm" :rules="registerRules" class="login-form">
+    <el-form-item prop="username">
+      <el-input
+        v-model="registerForm.username"
+        placeholder="请输入用户名"
+        prefix-icon="User"
+        size="large"
+      >
+        <template #prefix>
+          <el-icon><User /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item prop="password">
+      <el-input
+        v-model="registerForm.password"
+        placeholder="请输入密码"
+        type="password"
+        prefix-icon="Lock"
+        show-password
+        size="large"
+      >
+        <template #prefix>
+          <el-icon><Lock /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item prop="confirmPassword">
+      <el-input
+        v-model="registerForm.confirmPassword"
+        placeholder="请确认密码"
+        type="password"
+        prefix-icon="Lock"
+        show-password
+        size="large"
+      >
+        <template #prefix>
+          <el-icon><Lock /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button
+        type="primary"
+        @click="handleRegister"
+        size="large"
+        style="width: 100%;"
+      >
+        注册
+      </el-button>
+    </el-form-item>
+  </el-form>
+</el-dialog>
+
+<!-- 忘记密码对话框 -->
+<el-dialog v-model="showForgotPassword" title="忘记密码" width="420px">
+  <el-form :model="forgotForm" :rules="forgotRules" class="login-form">
+    <el-form-item prop="username">
+      <el-input
+        v-model="forgotForm.username"
+        placeholder="请输入用户名"
+        prefix-icon="User"
+        size="large"
+      >
+        <template #prefix>
+          <el-icon><User /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item prop="newPassword">
+      <el-input
+        v-model="forgotForm.newPassword"
+        placeholder="请输入新密码"
+        type="password"
+        prefix-icon="Lock"
+        show-password
+        size="large"
+      >
+        <template #prefix>
+          <el-icon><Lock /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item prop="confirmNewPassword">
+      <el-input
+        v-model="forgotForm.confirmNewPassword"
+        placeholder="请确认新密码"
+        type="password"
+        prefix-icon="Lock"
+        show-password
+        size="large"
+      >
+        <template #prefix>
+          <el-icon><Lock /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button
+        type="primary"
+        @click="handleForgotPassword"
+        size="large"
+        style="width: 100%;"
+      >
+        重置密码
+      </el-button>
+    </el-form-item>
+  </el-form>
+</el-dialog>
+            <div v-if="!isAuthenticated" class="login-container">
+                <div class="login-background">
+                    <div class="login-shapes">
+                        <div class="shape shape-1"></div>
+                        <div class="shape shape-2"></div>
+                        <div class="shape shape-3"></div>
+                    </div>
+                </div>
+                <el-card class="login-card">
+                    <div class="login-header">
+                        <div class="login-logo">
+                            <i class="el-icon-lock"></i>
+                        </div>
+                        <h2 class="login-title">智能安全管理系统</h2>
+                        <p class="login-subtitle">安全 · 智能 · 高效</p>
+                    </div>
+                    <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form">
+                        <el-form-item prop="username">
+                            <el-input
+                                v-model="loginForm.username"
+                                placeholder="请输入用户名"
+                                prefix-icon="User"
+                                size="large"
+                            >
+                                <template #prefix>
+                                    <el-icon><User /></el-icon>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item prop="password">
+                            <el-input
+                                v-model="loginForm.password"
+                                placeholder="请输入密码"
+                                type="password"
+                                prefix-icon="Lock"
+                                show-password
+                                size="large"
+                                @keyup.enter="handleLogin"
+                            >
+                                <template #prefix>
+                                    <el-icon><Lock /></el-icon>
+                                </template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button
+                                type="primary"
+                                @click="handleLogin"
+                                size="large"
+                                style="width: 100%; height: 44px; font-size: 16px;"
+                                :loading="loginLoading"
+                            >
+                                登录
+                            </el-button>
+                        </el-form-item>
+                        <div class="login-footer">
+                            <el-link type="primary" @click="showRegister = true">注册新账户</el-link>
+                            <el-link type="info" @click="showForgotPassword = true">忘记密码？</el-link>
+                        </div>
+                    </el-form>
+                </el-card>
+            </div>
+
+            <!-- 主界面 -->
+            <div v-else class="main-container">
+                <el-header class="header">
+                    <div class="header-left">
+                        <div class="logo">
+                            <i class="el-icon-lock"></i>
+                        </div>
+                        <span class="system-name">智能安全管理系统</span>
+                    </div>
+                    <div class="header-right">
+                        <el-dropdown @command="handleCommand">
+                            <span class="user-info">
+                                <el-avatar :size="32" :src="avatarUrl" />
+                                <span class="username">{{ currentUser.username }}</span>
+                                <el-tag :type="roleTagType" size="small">{{ currentUser.role }}</el-tag>
+                                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                            </span>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item command="profile">
+                                        <el-icon><User /></el-icon>个人中心
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="settings">
+                                        <el-icon><Setting /></el-icon>系统设置
+                                    </el-dropdown-item>
+                                    <el-dropdown-item divided command="logout">
+                                        <el-icon><SwitchButton /></el-icon>退出登录
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </div>
+                </el-header>
+
+                <el-container>
+                    <el-aside width="220px" class="sidebar">
+                        <div class="sidebar-header">
+                            <h3>功能菜单</h3>
+                        </div>
+                        <el-menu
+                            :default-active="activeMenu"
+                            router
+                            class="sidebar-menu"
+                        >
+                            <el-menu-item
+                                v-for="menu in menuItems"
+                                :key="menu.id"
+                                :index="menu.path"
+                            >
+                                <el-icon>
+                                    <component :is="menu.icon.replace('el-icon-', '')" />
+                                </el-icon>
+                                <span>{{ menu.name }}</span>
+                            </el-menu-item>
+                        </el-menu>
+                    </el-aside>
+
+                    <el-main class="content">
+                        <router-view></router-view>
+                    </el-main>
+                </el-container>
+            </div>
+        </el-container>
+    </div>
+</body>
+</html>
